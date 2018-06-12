@@ -2,8 +2,7 @@ FROM debian:sid-slim
 
 RUN echo 'deb http://deb.debian.org/debian sid main contrib non-free' > /etc/apt/sources.list
 RUN apt-get update
-RUN apt-get -y install latex2html latex2rtf pandoc tex4ht texlive-full build-essential emacs25-nox nano latexml bibtex2html fonts-freefont-otf fonts-freefont-ttf ttf-mscorefonts-installer html2ps imagemagick auctex emacs-goodies-el vim vim-latexsuite bibtexconv curl git
-# writer2latex
+RUN apt-get -y install latex2html latex2rtf pandoc pandoc-citeproc pandoc-citeproc-data biber tex4ht texlive-full build-essential emacs25-nox nano latexml bibtex2html fonts-freefont-otf fonts-freefont-ttf ttf-mscorefonts-installer html2ps imagemagick auctex emacs-goodies-el vim vim-latexsuite bibtexconv curl git writer2latex
 
 ## install latex2wp for wordpress export
 RUN curl -sSL https://get.haskellstack.org/ | sh
