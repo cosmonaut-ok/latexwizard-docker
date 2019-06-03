@@ -1,0 +1,147 @@
+#!/bin/bash
+
+## script to manage latexwizard image
+IMAGE=cosmonaut/latexwizard:latest
+
+ACTION=$1
+shift
+
+## make functions
+function make_pdf
+{
+    pdflatex $FILE_PATH
+}
+
+function make_docx
+{
+    get_csl
+    pandoc --csl=${FILE_DIR}/${CSL} -s $PANDOC_BIB_STRING $FILE_PATH -o "$FILE_DIR/$FILE_NAME".docx
+}
+
+function make_clean
+{
+    rm -rf $CSL
+    for i in out bbl dvi log out blg aux; do
+        rm -rf "$FILE_DIR"/"$FILE_NAME".${i}
+    done
+}
+
+function make_odt
+{
+    echo NOT IMPLEMENTED YET
+}
+
+function make_html
+{
+    echo NOT IMPLEMENTED YET
+}
+
+function make_html5
+{
+    echo NOT IMPLEMENTED YET
+}
+
+function make_markdown
+{
+    echo NOT IMPLEMENTED YET
+}
+
+function make_rtf
+{
+    echo NOT IMPLEMENTED YET
+}
+
+function make_epub
+{
+    echo NOT IMPLEMENTED YET
+}
+
+function make_fb2
+{
+    echo NOT IMPLEMENTED YET
+}
+
+function make_wordpress
+{
+    echo NOT IMPLEMENTED YET
+}
+#################
+
+case $ACTION in
+    "daemon")
+	exec docker run -d --rm --name latexwizard_daemon -i --user="$(id -u):$(id -g)" --net=none -t -v $PWD:/data "$IMAGE" /bin/sh -c "sleep infinity"
+	touch $PWD/.lw_daemonized
+	;;
+    "kill")
+	exec docker kill latexwizard_daemon
+	rm -f $PWD/.lw_daemonized
+	;;
+    "make")
+	case $1 in
+	    "pdf")
+		shift
+		make_pdf "$@"
+		;;
+	    "docx")
+		shift
+		make_docx "$@"
+		;;
+	    "odt")
+		shift
+		make_odt "$@"
+		;;
+	    "html")
+		shift
+		make_html "$@"
+		;;
+	    "html5")
+		shift
+		make_html5 "$@"
+		;;
+	    "md"|"markdown")
+		shift
+		make_markdown "$@"
+		;;
+	    "rtf")
+		shift
+		make_rtf "$@"
+		;;
+	    "epub")
+		shift
+		make_epub "$@"
+		;;
+	    "fb2")
+		shift
+		make_fb2 "$@"
+		;;
+	    "wp"|"wordpress")
+		shift
+		make_wordpress "$@"
+		;;
+	    "help")
+		echo "AVAILABLE OPTIONS: pdf, docx, odt, html, html5, md|markdown, etf, epub, fb2, wp|wordpress"
+		;;
+	    *)
+		echo "Fuck you"
+		;;
+	esac
+	# if [ -f $PWD/.lw_daemonized ]; then
+	#     exec docker exec -it latexwizard_daemon pdflatex "$@"
+	# else
+	#     exec docker run --rm -i --user="$(id -u):$(id -g)" --net=none -v "$PWD":/data "$IMAGE" "$@"
+	# fi
+	;;
+    "run")
+	if [ -f $PWD/.lw_daemonized ]; then
+	    exec docker exec -it latex_daemon "$@"
+	else
+	    exec docker run --rm -i --user="$(id -u):$(id -g)" --net=none -v "$PWD":/data "$IMAGE" "$@"
+	fi
+	;;
+    "help")
+	echo "AVAILABLE OPTIONS: daemon, kill, make, run"
+	;;
+    *)
+	echo "Fuck you"
+	;;
+esac
